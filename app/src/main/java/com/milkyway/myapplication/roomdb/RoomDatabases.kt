@@ -4,20 +4,23 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.milkyway.myapplication.model.Data
 import com.milkyway.myapplication.model.PostResponse
+import com.milkyway.myapplication.network.PostDao
 import com.milkyway.myapplication.network.PostsDao
 
-@Database(entities = arrayOf(PostResponse::class), version = 1, exportSchema = false)
+@Database(entities = arrayOf(Data::class), version = 1, exportSchema = false)
 abstract class RoomDatabases : RoomDatabase() {
 
-    abstract fun postDao(): PostsDao
+    abstract fun postsDao(): PostsDao<Data>
+    abstract fun postDao(): PostDao
 
     companion object {
 
         @Volatile
         private var INSTANCE: RoomDatabases? = null
 
-        fun getDataseClient(context: Context): RoomDatabases {
+        fun getDatabaseClient(context: Context): RoomDatabases {
 
             if (INSTANCE != null) return INSTANCE!!
 

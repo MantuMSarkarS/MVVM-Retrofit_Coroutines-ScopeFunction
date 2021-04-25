@@ -12,7 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.milkyway.myapplication.R
 import com.milkyway.myapplication.adapter.PostAdapter
 import com.milkyway.myapplication.viewmodel.PostViewModel
+
 import kotlinx.android.synthetic.main.activity_main.*
+
 class MainActivity : AppCompatActivity() {
 
     lateinit var  viewModel : PostViewModel
@@ -35,13 +37,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun downloadPostDetails() {
-        viewModel.getPostList(this)?.observe(this, Observer {
+        viewModel.getPostList()?.observe(this, Observer {
             it?.let {
                 recyclerview.setItemAnimator(DefaultItemAnimator())
                 adapter = PostAdapter(it)
+                findViewById<ProgressBar>(R.id.progress_bar).visibility = View.GONE
             }
         })
     }
-
 
 }

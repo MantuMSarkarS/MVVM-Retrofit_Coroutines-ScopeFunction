@@ -7,10 +7,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.milkyway.myapplication.R
-import com.milkyway.myapplication.model.PostResponse
+import com.milkyway.myapplication.model.Data
 import com.squareup.picasso.Picasso
 
-class PostAdapter(var data: PostResponse) : RecyclerView.Adapter<PostAdapter.MyViewHolder>() {
+class PostAdapter(var data: List<Data>) : RecyclerView.Adapter<PostAdapter.MyViewHolder>() {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -19,11 +19,11 @@ class PostAdapter(var data: PostResponse) : RecyclerView.Adapter<PostAdapter.MyV
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        holder.id.setText(data.data.id)
-        holder.email.setText(data.data.email)
-        holder.firstname.setText(data.data.firstName)
-        holder.lastname.setText(data.data.lastName)
-        Picasso.get().load(data.data.avatar).into(holder.image)
+        holder.id.setText(data.get(position).id)
+        holder.email.setText(data.get(position).email)
+        holder.firstname.setText(data.get(position).firstName)
+        holder.lastname.setText(data.get(position).lastName)
+        Picasso.get().load(data.get(position).avatar).into(holder.image)
     }
 
     override fun getItemCount(): Int {

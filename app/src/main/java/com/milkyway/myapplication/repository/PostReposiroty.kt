@@ -2,7 +2,10 @@ package com.milkyway.myapplication.repository
 
 import android.content.Context
 import android.util.Log
+import android.widget.Toast
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.milkyway.myapplication.model.Data
 import com.milkyway.myapplication.model.PostResponse
 import com.milkyway.myapplication.network.PostsDao
 import com.milkyway.myapplication.network.RetrofitClient
@@ -16,57 +19,43 @@ import retrofit2.Response
 
 object PostReposiroty {
 
-    lateinit var roomDao: PostsDao
-
     var roomDatabase: RoomDatabases? = null
 
-    var postList = MutableLiveData<PostResponse>()
+    var postList = MutableLiveData<List<Data>>()
+    var dataList : LiveData<List<Data>>? =null
 
     private var call = RetrofitClient.apiService.getALLPost()
 
-    fun getRetrofitInstance(context: Context) {
+    fun initializeDb(context: Context): RoomDatabases {
+        return RoomDatabases.getDatabaseClient(context)
+    }
 
+    fun getRetrofitInstance(context: Context) {
+        roomDatabase = initializeDb(context)
         GlobalScope.launch {
 
             call.enqueue(object : Callback<PostResponse> {
 
-                override fun onResponse(
-                    call: Call<PostResponse>,
-                    response: Response<PostResponse>
-                ) {
-
-                    val body = response.body()
-
-                    body?.apply {
-                        postList.value = PostResponse(data, support)
+                override fun onResponse(call: Call<PostResponse>, response: Response<PostResponse>) {
+                    response.body()?.data!!.let {
+                        roomDatabase!!.postsDao().insert(response.body()!!.data)
                     }
                 }
 
                 override fun onFailure(call: Call<PostResponse>, t: Throwable) {
                     Log.d("msg", t.message.toString())
+                    Toast.makeText(context, t.message.toString(),Toast.LENGTH_LONG).show()
                 }
             })
-            savePostToRoom(context, postList)
         }
     }
 
-    fun initializeDb(context: Context): RoomDatabases {
-        return RoomDatabases.getDataseClient(context)
-    }
-
-    private suspend fun savePostToRoom(context: Context, postList: MutableLiveData<PostResponse>) {
-        roomDatabase = initializeDb(context)
-        roomDatabase!!.postDao().insert(postList)
-        getDataFromRoomDb(context)
-    }
-
-     fun getDataFromRoomDb(context: Context): MutableLiveData<PostResponse> {
-        roomDatabase = initializeDb(context)
+     fun getDataFromRoomDb(): LiveData<List<Data>>? {
          GlobalScope.launch {
-             postList = roomDatabase!!.postDao().getAllPosts()
-             delay(1000)
+             dataList = roomDatabase!!.postDao().getAllPosts()
+             delay(100)
          }
-       return postList
+       return dataList
     }
 
 }

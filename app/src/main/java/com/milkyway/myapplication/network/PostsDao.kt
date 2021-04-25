@@ -1,17 +1,30 @@
 package com.milkyway.myapplication.network
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.room.*
-import com.milkyway.myapplication.model.PostResponse
+import com.milkyway.myapplication.model.Data
+
+
+/*
+@Dao
+abstract class PostsDao<Data> {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+   abstract fun insert(posts : MutableLiveData<List<Data>>)
+}
+*/
 
 @Dao
-interface PostsDao {
+abstract class PostsDao<Data> {
+    //Base Class
+    /*@Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun insert(entity: Data)*/
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(posts : MutableLiveData<PostResponse>)
+}
+@Dao
+abstract class PostDao : PostsDao<Data>() {
 
-    @Transaction
-    @Query("select * from posts")
-    suspend fun getAllPosts(): MutableLiveData<PostResponse>
+    /* @Transaction
+     @Query("select * from data")
+     abstract fun getAllPosts(): LiveData<List<Data>>*/
+
 }

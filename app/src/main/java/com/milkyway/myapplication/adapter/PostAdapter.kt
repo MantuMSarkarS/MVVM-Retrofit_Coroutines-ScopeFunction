@@ -19,7 +19,6 @@ class PostAdapter(var data: List<Data>) : RecyclerView.Adapter<PostAdapter.MyVie
     }
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        holder.id.setText(data.get(position).id)
         holder.email.setText(data.get(position).email)
         holder.firstname.setText(data.get(position).firstName)
         holder.lastname.setText(data.get(position).lastName)
@@ -27,12 +26,11 @@ class PostAdapter(var data: List<Data>) : RecyclerView.Adapter<PostAdapter.MyVie
     }
 
     override fun getItemCount(): Int {
-        return 1
+        return data.size
     }
 
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val id = itemView.findViewById<TextView>(R.id.id)
         val email = itemView.findViewById<TextView>(R.id.email)
         val firstname = itemView.findViewById<TextView>(R.id.firstname)
 

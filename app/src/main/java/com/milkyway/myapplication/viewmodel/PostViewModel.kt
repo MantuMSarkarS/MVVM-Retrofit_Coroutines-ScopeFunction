@@ -10,14 +10,15 @@ import com.milkyway.myapplication.repository.PostReposiroty
 
 class PostViewModel : ViewModel() {
 
-    var postLiveData: MutableLiveData<List<Data>>? = null
+    var postLiveData: LiveData<List<Data>>? = null
+    var postData: ArrayList<Data>? = null
 
     fun loadPostList(context: Context) {
-        PostReposiroty.getRetrofitInstance(context)
+      return PostReposiroty.getRetrofitInstance(context)
     }
 
-     fun getPostList(): LiveData<List<Data>>? {
-        postLiveData = PostReposiroty.getDataFromRoomDb()
+     fun getPostList(context: Context): LiveData<List<Data>>? {
+        postLiveData = PostReposiroty.getDataFromRoomDb(context)
         return postLiveData
     }
 

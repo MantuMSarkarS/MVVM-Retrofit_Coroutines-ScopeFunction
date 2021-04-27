@@ -7,12 +7,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.milkyway.myapplication.model.Data
 import com.milkyway.myapplication.model.PostResponse
-import com.milkyway.myapplication.network.PostsDao
 import com.milkyway.myapplication.network.RetrofitClient
 import com.milkyway.myapplication.roomdb.RoomDatabases
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.milkyway.myapplication.utils.Converters
+import kotlinx.coroutines.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -21,41 +19,47 @@ object PostReposiroty {
 
     var roomDatabase: RoomDatabases? = null
 
-    var postList = MutableLiveData<List<Data>>()
-    var dataList : LiveData<List<Data>>? =null
-
-    private var call = RetrofitClient.apiService.getALLPost()
+    var postList: LiveData<List<Data>>? = null
+    /*var dataList: ArrayList<Data>? = null
+    private var call = RetrofitClient.apiService.getALLPost()*/
 
     fun initializeDb(context: Context): RoomDatabases {
         return RoomDatabases.getDatabaseClient(context)
     }
 
-    fun getRetrofitInstance(context: Context) {
-        roomDatabase = initializeDb(context)
-        GlobalScope.launch {
+    fun getRetrofitInstance(context: Context)  = runBlocking{
 
-            call.enqueue(object : Callback<PostResponse> {
+       val job:Job= launch{
 
+            RetrofitClient.apiService.getALLPost().enqueue(object : Callback<PostResponse> {
                 override fun onResponse(call: Call<PostResponse>, response: Response<PostResponse>) {
-                    response.body()?.data!!.let {
-                        roomDatabase!!.postsDao().insert(response.body()!!.data)
+                    if (response.isSuccessful) {
+                        roomDatabase = initializeDb(context)
+                        launch {
+                            for (i in 0 until response.body()?.data!!.size) {
+                                roomDatabase!!.postsDao().insert(response.body()?.data!![i])
+                            }
+                        }
                     }
                 }
 
                 override fun onFailure(call: Call<PostResponse>, t: Throwable) {
                     Log.d("msg", t.message.toString())
-                    Toast.makeText(context, t.message.toString(),Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, t.message.toString(), Toast.LENGTH_LONG).show()
                 }
             })
         }
+        job.join()
     }
 
-     fun getDataFromRoomDb(): LiveData<List<Data>>? {
-         GlobalScope.launch {
-             dataList = roomDatabase!!.postDao().getAllPosts()
-             delay(100)
-         }
-       return dataList
+
+    fun getDataFromRoomDb(context: Context): LiveData<List<Data>>? = runBlocking{
+        roomDatabase = initializeDb(context)
+       val job:Job= launch {
+            postList = roomDatabase!!.postsDao().getAllPosts()
+        }
+        job.join()
+        return@runBlocking postList
     }
 
 }

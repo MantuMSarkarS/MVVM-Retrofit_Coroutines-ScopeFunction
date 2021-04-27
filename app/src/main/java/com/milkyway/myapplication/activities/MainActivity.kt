@@ -17,30 +17,29 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var  viewModel : PostViewModel
-    lateinit var context : Context
-    lateinit var adapter : PostAdapter
+    lateinit var viewModel: PostViewModel
+    lateinit var context: Context
+    lateinit var adapter: PostAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        context= this@MainActivity
-         viewModel = ViewModelProvider(this).get(PostViewModel::class.java)
+        context = this@MainActivity
+        viewModel = ViewModelProvider(this).get(PostViewModel::class.java)
 
         recyclerview.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
-        loadData.setOnClickListener(){
+        loadData.setOnClickListener() {
             findViewById<ProgressBar>(R.id.progress_bar).visibility = View.VISIBLE
             viewModel.loadPostList(context)
             downloadPostDetails()
         }
-
     }
 
     private fun downloadPostDetails() {
-        viewModel.getPostList()?.observe(this, Observer {
+        viewModel.getPostList(this)?.observe(this, Observer {
             it?.let {
-                recyclerview.setItemAnimator(DefaultItemAnimator())
                 adapter = PostAdapter(it)
+                recyclerview.adapter = adapter
                 findViewById<ProgressBar>(R.id.progress_bar).visibility = View.GONE
             }
         })

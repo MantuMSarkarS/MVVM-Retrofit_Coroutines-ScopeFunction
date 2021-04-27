@@ -6,10 +6,10 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
-data class PostResponse(
+class PostResponse(
     @Embedded
     @SerializedName("data")
-    var data: LiveData<List<Data>>/*,
+    var data: ArrayList<Data>/*,
     @Embedded
     val support: Support*/
 )
